@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+.App {
+  text-align: center;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.ui.card.weather-card,
+.ui.card.weather-card:first-child {
+  width: 320px;
+  margin: 32px auto;
+  border-radius: 1rem;
+}
+.ui.card.weather-card .content {
+  padding: 0;
+}
+.ui.card.weather-card>.content>.header,
+.ui.card.weather-card>.content>.header:not(.ui) {
+  background-color: #01579b;
+  color: whitesmoke;
+  margin: 0;
+  font-size: 18px;
+  border-radius: 1rem 1rem 0 0;
+  font-family: 'Recursive', sans-serif;
+  padding: 1rem 0.25rem;
+}
+.combo-select {
+  margin-top: 32px;
+}
