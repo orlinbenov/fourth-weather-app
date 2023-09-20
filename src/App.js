@@ -1,15 +1,13 @@
 import './App.css';
 import React, { useEffect, useState } from "react";
 import { Dimmer, Loader } from 'semantic-ui-react';
-import Weather from '../Weather/Weather';
-import Forecast from '../Forecast/Forecast';
-import cities from '../../store/city.list.json'
+import Weather from './components/Weather/Weather';
+import Forecast from './components/Forecast/Forecast';
+import cities from './store/city.list.json'
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 
 export default function App() {
-    const [lat, setLat] = useState(null);
-    const [long, setLong] = useState(null);
     const [weatherData, setWeatherData] = useState([]);
     const [forecast, setForecast] = useState([]);
     const [error, setError] = useState(null);
@@ -25,21 +23,17 @@ export default function App() {
         }
     })
 
-    useEffect(() => {
+    const loadForecast = () => {
         navigator.geolocation.getCurrentPosition(function(position) {
-            setLat(position.coords.latitude);
-            setLong(position.coords.longitude);
+            getCityWeatherData(position.coords.latitude, position.coords.longitude)
         }, function(error) {
-            // let's load Sofia initially and then the usr can select another city from the combo box
-            setLat(42.69751);
-            setLong(23.32415);
+            getCityWeatherData(42.69751, 23.32415)
         });
+    }
 
-        if (lat !== null && long !== null) {
-            getCityWeatherData(lat, long)
-        }
-        // eslint-disable-next-line
-    }, [lat,long,error])
+    useEffect(() => {
+        loadForecast();
+    }, [])
 
     function getCityWeatherData(lat, long) {
         getWeather(lat, long)
@@ -119,7 +113,7 @@ export default function App() {
             ): (
                 <div>
                     <Dimmer active>
-                        <Loader>Loading..</Loader>
+                        {error ? <div>{error}</div> : <Loader>Loading..</Loader>}
                     </Dimmer>
                 </div>
             )}

@@ -3,3 +3,10 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
+
+const mockGeolocation = {
+    getCurrentPosition: jest.fn(() => { return  { coords: { latitude: 42.69751, longitude: 23.32415 } } }),
+    watchPosition: jest.fn()
+};
+
+global.navigator.geolocation = mockGeolocation;

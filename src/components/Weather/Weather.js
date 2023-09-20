@@ -13,7 +13,7 @@ const styles = {
     }
 }
 
-const CardExampleCard = ({weatherData}) => (
+const WeatherCard = ({weatherData}) => (
     <Card className="weather-card">
         <Card.Content>
             <Card.Header>City Name: {weatherData.name}</Card.Header>
@@ -28,4 +28,4 @@ const CardExampleCard = ({weatherData}) => (
     </Card>
 )
 
-export default CardExampleCard;
+export default WeatherCard;

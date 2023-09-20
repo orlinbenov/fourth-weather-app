@@ -27,9 +27,7 @@ const styles = {
     }
 }
 
-export default function Forecast(props) {
-    const { forecast } = props;
-
+export default function Forecast({ forecast }) {
     const fiveDaysForecast = forecast.map((item, index) => {
         let weatherIcon;
 
