@@ -3,25 +3,12 @@ import React, { useEffect, useState } from "react";
 import { Dimmer, Loader } from 'semantic-ui-react';
 import Weather from './components/Weather/Weather';
 import Forecast from './components/Forecast/Forecast';
-import cities from './store/city.list.json'
 import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
 
 export default function App() {
     const [weatherData, setWeatherData] = useState([]);
     const [forecast, setForecast] = useState([]);
     const [error, setError] = useState(null);
-
-    const mappedCities = cities.map(city => {
-        return {
-            coord: {
-                lon: city.coord.lon,
-                lat: city.coord.lat
-            },
-            country: city.country,
-            name: city.name
-        }
-    })
 
     const loadForecast = () => {
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -63,9 +50,40 @@ export default function App() {
         }
     }
 
+
+    const debounce = (func, delay) => {
+        let timeoutId;
+
+        return (...args) => {
+            clearTimeout(timeoutId);
+
+            timeoutId = setTimeout(() => {
+                func.apply(this, args);
+            }, delay);
+        };
+    };
+
+    const getCitySearch = (q) => {
+        return fetch(
+            `${process.env.REACT_APP_API_URL}/forecast?q=${q.target.value}&units=metric&appid=${process.env.REACT_APP_API_KEY}`
+        )
+            .then(res => handleResponse(res))
+            .then(results => {
+                if (Object.entries(results).length) {
+                    setWeatherData(results.list[0])
+                    setForecast(results.list.filter(forecast => forecast.dt_txt.match(/09:00:00/)));
+                }
+            })
+            .catch(err => {
+                console.warn(err)
+            })
+    };
+
+    const debouncedSearch = debounce(getCitySearch, 500);
+
     function getWeather(lat, long) {
         return fetch(
-            `${process.env.REACT_APP_API_URL}/weather/?lat=${lat}&lon=${long}&units=metric&APPID=${process.env.REACT_APP_API_KEY}`
+            `${process.env.REACT_APP_API_URL}/weather/?lat=${lat}&lon=${long}&units=metric&appid=${process.env.REACT_APP_API_KEY}`
         )
             .then(res => handleResponse(res))
             .then(weather => {
@@ -77,7 +95,7 @@ export default function App() {
 
     function getForecast(lat, long) {
         return fetch(
-            `${process.env.REACT_APP_API_URL}/forecast/?lat=${lat}&lon=${long}&units=metric&APPID=${process.env.REACT_APP_API_KEY}`
+            `${process.env.REACT_APP_API_URL}/forecast/?lat=${lat}&lon=${long}&units=metric&appid=${process.env.REACT_APP_API_KEY}`
         )
             .then(res => handleResponse(res))
             .then(forecastData => {
@@ -92,20 +110,7 @@ export default function App() {
         <div className="App">
             {(typeof weatherData.main != 'undefined') ? (
                 <div>
-                    <Autocomplete
-                        disablePortal
-                        id="city-select"
-                        className="combo-select"
-                        onChange={(event, newValue) => {
-                            if (newValue) {
-                                getCityWeatherData(newValue.coord.lat, newValue.coord.lon)
-                            }
-                        }}
-                        options={mappedCities}
-                        sx={{ width: 320 }}
-                        getOptionLabel={(option) => `${option.name} | ${option.country}`}
-                        renderInput={(params) => <TextField {...params} label="Search..." />}
-                    />
+                    <TextField onChange={(e) => { debouncedSearch(e) }} />
 
                     <Weather weatherData={weatherData}/>
                     <Forecast forecast={forecast}/>
